@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🌍 FRINDER — Verified Global Friendship Platform
 > Pure Friendship. No Borders. No Limits.
 
@@ -253,3 +254,6 @@ frinder/
 ---
 
 © 2025-26 Frinder · DBMS Project · Pure Friendship · No Borders · No Limits
+=======
+# Frinder
+>>>>>>> 5fa6cae8a9cb691534509a17bf8c729d95ab0478

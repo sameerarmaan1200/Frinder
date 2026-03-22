@@ -1,0 +1,10 @@
+backend/config/db.php
+backend/config/mail.php
+frontend/node_modules/
+frontend/dist/
+uploads/posts/
+uploads/selfies/
+uploads/documents/
+vendor/
+.DS_Store
+Thumbs.db
