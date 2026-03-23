@@ -1,12 +1,11 @@
 <?php
 // ============================================================
-// FRINDER — Database Configuration
+// FRINDER — Database Configuration (Live Server)
 // ============================================================
-
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'frinder');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_HOST', 'sql107.infinityfree.com');
+define('DB_NAME', 'if0_41452430_frinder');
+define('DB_USER', 'if0_41452430');
+define('DB_PASS', 'B4MCjt9Hjt');
 define('DB_CHARSET', 'utf8mb4');
 
 function getDB(): PDO {

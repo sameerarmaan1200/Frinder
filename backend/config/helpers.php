@@ -6,15 +6,22 @@
 require_once __DIR__ . '/db.php';
 
 // ─── CORS Headers ────────────────────────────────────────────
-header('Access-Control-Allow-Origin: http://localhost:5173');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
-header('Content-Type: application/json; charset=utf-8');
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(204);
-    exit;
+if (isset($_SERVER['HTTP_ORIGIN'])) {
+    header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+    header('Access-Control-Allow-Credentials: true');
+    header('Access-Control-Max-Age: 86400');
 }
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
+        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    }
+    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
+        header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
+    }
+    http_response_code(200);
+    exit(0);
+}
+header('Content-Type: application/json; charset=utf-8');
 
 // ─── JSON Response ───────────────────────────────────────────
 function respond(bool $success, string $message, array $data = [], int $code = 200): void {
@@ -121,7 +128,6 @@ function sendOTPEmail(string $toEmail, string $toName, string $otp, string $purp
     </body>
     </html>";
 
-    // Try PHPMailer if available
     if (file_exists(__DIR__ . '/../../vendor/autoload.php')) {
         require_once __DIR__ . '/../../vendor/autoload.php';
         $mail = new PHPMailer\PHPMailer\PHPMailer(true);
@@ -145,9 +151,8 @@ function sendOTPEmail(string $toEmail, string $toName, string $otp, string $purp
         }
     }
     
-    // Fallback: log OTP to error log for local dev (check Apache error.log)
     error_log("FRINDER OTP [{$purpose}] for {$toEmail}: {$otp}");
-    return true; // Return true so app works without email in dev
+    return true;
 }
 
 // ─── Log Activity ────────────────────────────────────────────

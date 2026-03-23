@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const BASE = '/api'
+const BASE = 'https://api.allorigins.win/raw?url=https://frinder.infinityfree.me/backend'
 
 const api = axios.create({ baseURL: BASE })
 
@@ -108,6 +108,6 @@ export const adminAPI = {
   resolveReport: (data) => api.post('/admin/admin.php?action=resolve_report', data),
 }
 
-export const imgSrc = (path) => path ? `/api/uploads/posts/${path}` : null
+export const imgSrc = (path) => path ? `https://api.allorigins.win/raw?url=https://frinder.infinityfree.me/uploads/posts/${path}` : null
 
 export default api
