@@ -645,6 +645,7 @@ frinder/
 | 22 | admin_users | Admin accounts |
 | 23 | post_reaction | user can react anything on post |
 
+
 ---
 
 
@@ -727,7 +728,6 @@ frinder/
 | Email | PHPMailer + SMTP |
 | Local Dev | XAMPP |
 
----
 
 © 2025-26 Frinder · DBMS Project · Pure Friendship · No Borders · No Limits
 =======
