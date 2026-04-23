@@ -21,8 +21,14 @@ if ($action === 'login' && $method === 'POST') {
     }
 
     $pdo->prepare('UPDATE admin_users SET last_login=NOW() WHERE admin_id=?')->execute([$admin['admin_id']]);
+
+    // Always return success + token
     respond(true, 'Admin login successful', [
-        'admin' => ['admin_id' => $admin['admin_id'], 'admin_name' => $admin['admin_name'], 'role' => $admin['role']],
+        'admin' => [
+            'admin_id'   => $admin['admin_id'],
+            'admin_name' => $admin['admin_name'],
+            'role'       => $admin['role']
+        ],
         'token' => base64_encode($admin['email'] . ':' . $admin['password_hash'])
     ]);
 }
@@ -54,11 +60,9 @@ if ($action === 'analytics') {
     $totalFriends  = $pdo->query('SELECT COUNT(*) FROM friends')->fetchColumn();
     $totalReports  = $pdo->query('SELECT COUNT(*) FROM reports WHERE status="pending"')->fetchColumn();
 
-    // Daily registrations (last 7 days)
     $stmt = $pdo->query('SELECT DATE(created_at) AS day, COUNT(*) AS count FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) GROUP BY day ORDER BY day');
     $dailyRegs = $stmt->fetchAll();
 
-    // Top countries
     $stmt = $pdo->query('SELECT c.country_name, c.flag_emoji, COUNT(*) AS user_count FROM users u JOIN countries c ON c.country_id=u.country_id GROUP BY u.country_id ORDER BY user_count DESC LIMIT 10');
     $topCountries = $stmt->fetchAll();
 

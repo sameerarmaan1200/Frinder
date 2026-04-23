@@ -1,17 +1,12 @@
-import { motion } from 'framer-motion'
+import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 // ─── Page Wrapper with transition ────────────────────────────
 export function PageWrapper({ children, className = '' }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }}
-      transition={{ duration: 0.25, ease: 'easeOut' }}
-      className={`min-h-screen bg-dark-500 ${className}`}
-    >
+    <div className={`min-h-screen bg-dark-500 ${className}`}>
       {children}
-    </motion.div>
+    </div>
   )
 }
 
@@ -20,12 +15,27 @@ export function Avatar({ src, name = '', size = 'md', online = false, className 
   const sizes = { xs: 'w-7 h-7 text-xs', sm: 'w-9 h-9 text-sm', md: 'w-11 h-11 text-base', lg: 'w-14 h-14 text-lg', xl: 'w-20 h-20 text-2xl', '2xl': 'w-28 h-28 text-4xl' }
   const dotSizes = { xs: 'w-2 h-2', sm: 'w-2.5 h-2.5', md: 'w-3 h-3', lg: 'w-3.5 h-3.5', xl: 'w-4 h-4', '2xl': 'w-4 h-4' }
   const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
-  const imgSrc   = src ? `/api/uploads/posts/${src}` : null
+
+  // Build correct image URL based on stored path
+  // "selfies/file.jpg"  -> /api/uploads/selfies/file.jpg
+  // "posts/file.jpg"    -> /api/uploads/posts/file.jpg
+  // "file.jpg"          -> /api/uploads/posts/file.jpg (legacy avatars)
+  const getImgUrl = (s) => {
+    if (!s) return null
+    if (s.startsWith('selfies/')) return `/api/uploads/${s}`
+    if (s.startsWith('posts/'))   return `/api/uploads/${s}`
+    if (s.startsWith('http'))     return s
+    return `/api/uploads/posts/${s}`
+  }
+
+  const [imgFailed, setImgFailed] = React.useState(false)
+  const imgUrl = !imgFailed ? getImgUrl(src) : null
+
   return (
     <div className={`relative inline-flex shrink-0 ${className}`}>
       <div className={`${sizes[size]} rounded-full overflow-hidden flex items-center justify-center font-bold bg-gradient-to-br from-primary-600 to-primary-800 text-white border-2 border-primary-500/30`}>
-        {imgSrc
-          ? <img src={imgSrc} alt={name} className="w-full h-full object-cover" onError={e => { e.target.style.display='none' }} />
+        {imgUrl
+          ? <img src={imgUrl} alt={name} className="w-full h-full object-cover" onError={() => setImgFailed(true)} />
           : <span>{initials || '?'}</span>
         }
       </div>
@@ -197,9 +207,6 @@ export function Toast({ message, type = 'success', onClose }) {
 }
 
 // ─── Toast container hook ────────────────────────────────────
-import { useState } from 'react'
-import { AnimatePresence } from 'framer-motion'
-
 export function useToast() {
   const [toasts, setToasts] = useState([])
   const show = (message, type = 'success') => {

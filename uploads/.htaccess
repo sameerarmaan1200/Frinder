@@ -1,2 +1,7 @@
-Order Deny,Allow
-Deny from all
+# Prevent directory listing
+Options -Indexes
+
+# Allow access to image files
+<FilesMatch "\.(jpg|jpeg|png|gif)$">
+    Require all granted
+</FilesMatch>

@@ -14,6 +14,11 @@ export default function CreatePost({ onCreated }) {
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState('')
   const fileRef = useRef()
+  const unpack = (payload) => (
+    payload?.data && typeof payload.data === 'object'
+      ? { ...payload, ...payload.data, data: payload.data }
+      : payload
+  )
 
   const handleImage = (e) => {
     const f = e.target.files[0]
@@ -40,7 +45,7 @@ export default function CreatePost({ onCreated }) {
           headers: { Authorization: `Bearer ${localStorage.getItem('frinder_token')}` },
           body: fd
         })
-        data = await r.json()
+        data = unpack(await r.json())
       } else {
         const r = await postAPI.create({ content, visibility })
         data = r.data

@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useAuth } from '../context/AuthContext'
-import { Avatar } from './UI'
-import { friendAPI } from '../services/api'
+import { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
+import { Avatar } from './UI';
+import { friendAPI } from '../services/api';
 
 const navLinks = [
   { to: '/dashboard', icon: '⊞', label: 'Home' },
@@ -12,36 +12,46 @@ const navLinks = [
   { to: '/chat',      icon: '💬', label: 'Chat' },
   { to: '/events',    icon: '🎉', label: 'Events' },
   { to: '/map',       icon: '🗺️', label: 'Map' },
-]
+];
 
-export default function Navbar() {
-  const { user, logout } = useAuth()
-  const location = useLocation()
-  const navigate = useNavigate()
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const [profileOpen, setProfileOpen] = useState(false)
-  const [pendingCount, setPendingCount] = useState(0)
+export default function Navbar({ onAboutClick }) {
+  const { user, logout } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
-    if (!user) return
-    friendAPI.getReceived().then(r => setPendingCount(r.data.requests?.length || 0)).catch(() => {})
+    if (!user) return;
+    friendAPI.getReceived().then(r => setPendingCount(r.data.requests?.length || 0)).catch(() => {});
     const interval = setInterval(() => {
-      friendAPI.getReceived().then(r => setPendingCount(r.data.requests?.length || 0)).catch(() => {})
-    }, 30000)
-    return () => clearInterval(interval)
-  }, [user])
+      friendAPI.getReceived().then(r => setPendingCount(r.data.requests?.length || 0)).catch(() => {});
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   const handleLogout = async () => {
-    await logout()
-    navigate('/login')
-  }
+    await logout();
+    navigate('/login');
+  };
 
-  if (!user) return null
+  // Safe handler for About Us click
+  const handleAboutClick = () => {
+    if (onAboutClick) {
+      onAboutClick();
+    } else {
+      // Optional: show a fallback message or do nothing
+      console.warn('About Us clicked but no handler provided');
+    }
+  };
+
+  if (!user) return null;
 
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex fixed left-0 top-0 h-full w-20 xl:w-64 flex-col z-40 glass-dark border-r border-primary-500/10">
+      <aside className="hidden lg:flex fixed left-0 top-0 h-full w-20 xl:w-64 flex-col z-40 glass-dark border-r border-white/20">
         {/* Logo */}
         <Link to="/dashboard" className="flex items-center gap-3 px-4 xl:px-6 py-6 shrink-0">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-black text-lg shadow-glow-sm shrink-0">F</div>
@@ -51,7 +61,7 @@ export default function Navbar() {
         {/* Nav links */}
         <nav className="flex-1 px-3 xl:px-4 py-4 flex flex-col gap-1 overflow-y-auto">
           {navLinks.map(link => {
-            const active = location.pathname.startsWith(link.to)
+            const active = location.pathname.startsWith(link.to);
             return (
               <Link key={link.to} to={link.to}
                 className={`relative flex items-center gap-3 px-3 xl:px-4 py-3 rounded-xl transition-all duration-200 group
@@ -67,12 +77,21 @@ export default function Navbar() {
                 )}
                 {active && <motion.div layoutId="activeNav" className="absolute inset-0 rounded-xl bg-primary-500/10 border border-primary-500/20 -z-10" />}
               </Link>
-            )
+            );
           })}
+
+          {/* About Us button */}
+          <button
+            onClick={handleAboutClick}
+            className="relative flex items-center gap-3 px-3 xl:px-4 py-3 rounded-xl transition-all duration-200 group text-slate-500 hover:text-slate-200 hover:bg-primary-500/5 w-full text-left"
+          >
+            <span className="text-xl leading-none">🍭</span>
+            <span className="hidden xl:block text-sm font-semibold">About Us</span>
+          </button>
         </nav>
 
         {/* User section */}
-        <div className="px-3 xl:px-4 py-4 border-t border-primary-500/10 shrink-0">
+        <div className="px-3 xl:px-4 py-4 border-t border-white/20 shrink-0">
           <div className="relative">
             <button onClick={() => setProfileOpen(!profileOpen)}
               className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-primary-500/5 transition-colors group"
@@ -109,7 +128,7 @@ export default function Navbar() {
       </aside>
 
       {/* Mobile top bar */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 glass-dark border-b border-primary-500/10 px-4 py-3 flex items-center justify-between">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 glass-dark border-b border-white/20 px-4 py-3 flex items-center justify-between">
         <Link to="/dashboard" className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-black text-sm">F</div>
           <span className="font-black text-lg gradient-text font-display tracking-widest">FRINDER</span>
@@ -143,7 +162,15 @@ export default function Navbar() {
                   {link.to === '/friends' && pendingCount > 0 && <span className="ml-auto bg-primary-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{pendingCount}</span>}
                 </Link>
               ))}
-              <div className="border-t border-primary-500/10 mt-4 pt-4 flex flex-col gap-2">
+              {/* About Us button in mobile menu */}
+              <button
+                onClick={() => { setMobileOpen(false); handleAboutClick(); }}
+                className="flex items-center gap-4 px-4 py-4 rounded-xl transition-colors text-slate-400 hover:text-white hover:bg-primary-500/5 w-full text-left"
+              >
+                <span className="text-2xl">🍭</span>
+                <span className="text-base font-semibold">About Us</span>
+              </button>
+              <div className="border-t border-white/20 mt-4 pt-4 flex flex-col gap-2">
                 <Link to="/profile" onClick={() => setMobileOpen(false)} className="flex items-center gap-4 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-primary-500/5 transition-colors">
                   <Avatar src={user.profile_picture} name={user.full_name} size="sm" online />
                   <div>
@@ -161,18 +188,26 @@ export default function Navbar() {
       </AnimatePresence>
 
       {/* Mobile bottom nav */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 glass-dark border-t border-primary-500/10 flex">
-        {navLinks.slice(0, 6).map(link => {
-          const active = location.pathname.startsWith(link.to)
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 glass-dark border-t border-white/20 flex">
+        {navLinks.slice(0, 5).map(link => {
+          const active = location.pathname.startsWith(link.to);
           return (
             <Link key={link.to} to={link.to} className={`relative flex-1 flex flex-col items-center py-2.5 gap-0.5 transition-colors ${active ? 'text-primary-400' : 'text-slate-600 hover:text-slate-300'}`}>
               <span className="text-xl leading-none">{link.icon}</span>
               <span className="text-[9px] font-semibold">{link.label}</span>
               {link.to === '/friends' && pendingCount > 0 && <span className="absolute top-1 right-1/4 bg-primary-500 text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">{pendingCount}</span>}
             </Link>
-          )
+          );
         })}
+        {/* About Us in mobile bottom nav */}
+        <button
+          onClick={handleAboutClick}
+          className="relative flex-1 flex flex-col items-center py-2.5 gap-0.5 transition-colors text-slate-600 hover:text-slate-300"
+        >
+          <span className="text-xl leading-none">🍭</span>
+          <span className="text-[9px] font-semibold">About Us</span>
+        </button>
       </nav>
     </>
-  )
+  );
 }

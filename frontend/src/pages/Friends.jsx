@@ -1,80 +1,80 @@
-import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
-import { PageWrapper, Avatar, Btn, Card, EmptyState, useToast } from '../components/UI'
-import Navbar from '../components/Navbar'
-import FriendCard from '../components/FriendCard'
-import { friendAPI } from '../services/api'
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { PageWrapper, Avatar, Btn, Card, EmptyState, useToast } from '../components/UI';
+import Navbar from '../components/Navbar';
+import FriendCard from '../components/FriendCard';
+import { friendAPI } from '../services/api';
 
 export default function Friends() {
-  const { show, ToastContainer } = useToast()
-  const [tab, setTab]           = useState('friends')
-  const [friends, setFriends]   = useState([])
-  const [received, setReceived] = useState([])
-  const [sent, setSent]         = useState([])
-  const [loading, setLoading]   = useState(true)
-  const [search, setSearch]     = useState('')
+  const { show, ToastContainer } = useToast();
+  const [tab, setTab]           = useState('friends');
+  const [friends, setFriends]   = useState([]);
+  const [received, setReceived] = useState([]);
+  const [sent, setSent]         = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [search, setSearch]     = useState('');
 
   const load = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       const [fr, rec, snt] = await Promise.all([
         friendAPI.getFriends(),
         friendAPI.getReceived(),
         friendAPI.getSent(),
-      ])
-      setFriends(fr.data.friends || [])
-      setReceived(rec.data.requests || [])
-      setSent(snt.data.requests || [])
-    } catch { show('Failed to load', 'error') }
-    finally { setLoading(false) }
-  }
+      ]);
+      setFriends(fr.data.friends || []);
+      setReceived(rec.data.requests || []);
+      setSent(snt.data.requests || []);
+    } catch { show('Failed to load', 'error'); }
+    finally { setLoading(false); }
+  };
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load(); }, []);
 
   const handleAccept = async (req) => {
     try {
-      await friendAPI.accept({ request_id: req.request_id })
-      setReceived(p => p.filter(r => r.request_id !== req.request_id))
-      show(`You and ${req.full_name} are now friends! 🎉`, 'success')
-      load()
-    } catch { show('Failed', 'error') }
-  }
+      await friendAPI.accept({ request_id: req.request_id });
+      setReceived(p => p.filter(r => r.request_id !== req.request_id));
+      show(`You and ${req.full_name} are now friends! 🎉`, 'success');
+      load();
+    } catch { show('Failed', 'error'); }
+  };
 
   const handleDecline = async (req) => {
     try {
-      await friendAPI.decline({ request_id: req.request_id })
-      setReceived(p => p.filter(r => r.request_id !== req.request_id))
+      await friendAPI.decline({ request_id: req.request_id });
+      setReceived(p => p.filter(r => r.request_id !== req.request_id));
     } catch {}
-  }
+  };
 
   const handleCancel = async (req) => {
     try {
-      await friendAPI.cancel({ request_id: req.request_id })
-      setSent(p => p.filter(r => r.request_id !== req.request_id))
-      show('Request cancelled', 'info')
+      await friendAPI.cancel({ request_id: req.request_id });
+      setSent(p => p.filter(r => r.request_id !== req.request_id));
+      show('Request cancelled', 'info');
     } catch {}
-  }
+  };
 
   const handleUnfriend = async (friendUserId, name) => {
-    if (!confirm(`Remove ${name} from friends?`)) return
+    if (!confirm(`Remove ${name} from friends?`)) return;
     try {
-      await friendAPI.unfriend({ user_id: friendUserId })
-      setFriends(p => p.filter(f => f.user_id !== friendUserId))
-      show('Removed from friends', 'info')
+      await friendAPI.unfriend({ user_id: friendUserId });
+      setFriends(p => p.filter(f => f.user_id !== friendUserId));
+      show('Removed from friends', 'info');
     } catch {}
-  }
+  };
 
   const filteredFriends = friends.filter(f =>
     f.full_name.toLowerCase().includes(search.toLowerCase()) ||
     f.username.toLowerCase().includes(search.toLowerCase())
-  )
+  );
 
   const tabs = [
-    { key: 'friends',  label: 'Friends',          count: friends.length },
-    { key: 'received', label: 'Requests',          count: received.length },
-    { key: 'sent',     label: 'Sent',              count: sent.length },
-  ]
+    { key: 'friends',  label: 'Friends',   count: friends.length },
+    { key: 'received', label: 'Requests',  count: received.length },
+    { key: 'sent',     label: 'Sent',      count: sent.length },
+  ];
 
   return (
     <PageWrapper>
@@ -91,8 +91,8 @@ export default function Friends() {
             <Link to="/discover"><Btn size="sm">Find Friends 🌍</Btn></Link>
           </div>
 
-          {/* Tabs */}
-          <div className="flex gap-2 mb-6 glass rounded-2xl p-1.5 border border-primary-500/15">
+          {/* Tabs - with skyblue border */}
+          <div className="flex gap-2 mb-6 glass rounded-2xl p-1.5 border-2 border-sky-400/60 shadow-lg shadow-sky-500/20">
             {tabs.map(t => (
               <button key={t.key} onClick={() => setTab(t.key)}
                 className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200
@@ -112,7 +112,7 @@ export default function Friends() {
                 <input
                   type="text" value={search} onChange={e => setSearch(e.target.value)}
                   placeholder="🔍 Search friends…"
-                  className="w-full mb-4 bg-dark-300 border border-primary-500/20 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:border-primary-500 px-4 py-3 text-sm"
+                  className="w-full mb-4 bg-dark-300 border-2 border-sky-400/60 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:border-sky-400 px-4 py-3 text-sm shadow-lg shadow-sky-500/20"
                 />
                 {loading ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -125,7 +125,7 @@ export default function Friends() {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {filteredFriends.map(f => (
-                      <Card key={f.user_id} className="p-4">
+                      <Card key={f.user_id} className="p-4 border-2 border-sky-400/60 shadow-lg shadow-sky-500/20">
                         <div className="flex items-center gap-3 mb-3">
                           <Link to={`/profile/${f.user_id}`}>
                             <Avatar src={f.profile_picture} name={f.full_name} size="lg" online={!!f.is_online} />
@@ -161,7 +161,7 @@ export default function Friends() {
                 ) : (
                   <div className="space-y-3">
                     {received.map(req => (
-                      <Card key={req.request_id} className="p-4">
+                      <Card key={req.request_id} className="p-4 border-2 border-sky-400/60 shadow-lg shadow-sky-500/20">
                         <div className="flex items-center gap-4">
                           <Link to={`/profile/${req.user_id}`}>
                             <Avatar src={req.profile_picture} name={req.full_name} size="lg" online={!!req.is_online} />
@@ -193,7 +193,7 @@ export default function Friends() {
                 ) : (
                   <div className="space-y-3">
                     {sent.map(req => (
-                      <Card key={req.request_id} className="p-4">
+                      <Card key={req.request_id} className="p-4 border-2 border-sky-400/60 shadow-lg shadow-sky-500/20">
                         <div className="flex items-center gap-4">
                           <Link to={`/profile/${req.user_id}`}>
                             <Avatar src={req.profile_picture} name={req.full_name} size="lg" />
@@ -219,5 +219,5 @@ export default function Friends() {
         </div>
       </div>
     </PageWrapper>
-  )
+  );
 }

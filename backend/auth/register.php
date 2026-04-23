@@ -55,8 +55,8 @@ if ($now->diff($dobDate)->y < 13) {
 // Create user
 $hash = password_hash($password, PASSWORD_BCRYPT);
 $stmt = $pdo->prepare('
-    INSERT INTO users (username, email, password_hash, full_name, date_of_birth, gender, country_id, city)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO users (username, email, password_hash, full_name, date_of_birth, gender, country_id, city, account_status)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, "active")
 ');
 $stmt->execute([$username, $email, $hash, $full_name, $dob, $gender, $country_id, $city]);
 $userId = $pdo->lastInsertId();

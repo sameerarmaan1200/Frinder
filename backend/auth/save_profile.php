@@ -30,12 +30,13 @@ try {
     }
 
     // Save languages
+    $pdo->prepare('DELETE FROM user_languages WHERE user_id = ?')->execute([$userId]);
     if (!empty($languages)) {
-        $pdo->prepare('DELETE FROM user_languages WHERE user_id = ?')->execute([$userId]);
         $stmtL = $pdo->prepare('INSERT IGNORE INTO user_languages (user_id, language_id, proficiency, is_native) VALUES (?, ?, ?, ?)');
         foreach ($languages as $lang) {
-            $isNative = ($lang['proficiency'] === 'Native') ? 1 : 0;
-            $stmtL->execute([$userId, (int)$lang['language_id'], $lang['proficiency'], $isNative]);
+            $proficiency = $lang['proficiency'] ?? 'Conversational';
+            $isNative = ($proficiency === 'Native') ? 1 : 0;
+            $stmtL->execute([$userId, (int)$lang['language_id'], $proficiency, $isNative]);
         }
     }
 
